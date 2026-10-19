@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Apple Drop</title>
+<title>Apple Drop Slow</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -329,7 +329,6 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
         <div><span class="k">MOST APPLES</span><span class="v" id="pbApples">0</span></div>
         <div><span class="k">LONGEST RUN</span><span class="v" id="pbTime">0s</span></div>
       </div>
-      <div class="diag" id="diag"></div>
     </footer>
   </div>
 </div>
@@ -486,21 +485,21 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
       hero: { x: .74, y: .27, s: .6, a: .11, bob: .012, spin: 0 } },
     { name: 'SNOWFALL',  e: '❄️', hue: 192, n: 24, size: [.03, .08], vx: -.01, vy: .05, sway: .015, spin: .4, tw: 0, a: .13, style: 'fill' },
     { name: 'SAKURA',    e: '🌸', hue: 330, n: 20, size: [.035, .075], vx: .03, vy: .045, sway: .03, spin: .8, tw: 0, a: .12, style: 'fill' },
-    { name: 'THUNDER',   e: '⚡', hue: 52,  n: 9,  size: [.06, .12], vx: 0, vy: 0, sway: 0, spin: 0, tw: 0, a: .12, style: 'line', flicker: true,
+    { name: 'VOLTAGE',   e: '⚡', hue: 52,  n: 9,  size: [.06, .12], vx: 0, vy: 0, sway: 0, spin: 0, tw: 0, a: .12, style: 'line', flicker: true,
       hero: { x: .5, y: .56, s: .85, a: .055, bob: 0, spin: 0 } },
-    { name: 'RHYTHM',    e: '🎵', hue: 176, n: 16, size: [.04, .08], vx: 0, vy: -.035, sway: .025, spin: .2, tw: 0, a: .13, style: 'fill' },
-    { name: 'CLOVER',    e: '🍀', hue: 132, layout: 'grid', size: [.07, .07], vx: .012, vy: .014, spin: .15, tw: 0, a: .085 },
+    { name: 'GROOVE',    e: '🎵', hue: 176, n: 16, size: [.04, .08], vx: 0, vy: -.035, sway: .025, spin: .2, tw: 0, a: .13, style: 'fill' },
+    { name: 'FORTUNE',    e: '🍀', hue: 132, layout: 'grid', size: [.07, .07], vx: .012, vy: .014, spin: .15, tw: 0, a: .085 },
     { name: 'BLAZE',     e: '🔥', hue: 20,  n: 18, size: [.04, .09], vx: 0, vy: -.06, sway: .02, spin: 0, tw: 0, a: .15, style: 'fill', fadeUp: true },
-    { name: 'CRYSTAL',   e: '💎', hue: 292, layout: 'grid', size: [.06, .06], vx: 0, vy: .008, spin: .3, tw: 1.2, a: .1 },
+    { name: 'RADIANCE',   e: '💎', hue: 292, layout: 'grid', size: [.06, .06], vx: 0, vy: .008, spin: .3, tw: 1.2, a: .1 },
     { name: 'ORBIT',     e: '🪐', hue: 38,  n: 12, size: [.022, .045], orbit: true, tw: 0, a: .15, style: 'fill',
       hero: { x: .5, y: .5, s: .72, a: .075, bob: .01, spin: .03 } },
     { name: 'OCEAN',     e: '🌊', hue: 205, n: 9,  size: [.10, .16], vx: .03, vy: 0, sway: .01, spin: 0, tw: 0, a: .10, style: 'line' },
     { name: 'FLUTTER',   e: '🦋', hue: 285, n: 12, size: [.045, .08], vx: .01, vy: -.02, sway: .06, spin: .3, tw: 0, a: .13, style: 'fill' },
     { name: 'MIRAGE',    e: '🌵', hue: 95,  layout: 'grid', size: [.07, .07], vx: -.012, vy: 0, spin: 0, tw: .6, a: .085 },
-    { name: 'INVADERS',  e: '👾', hue: 150, layout: 'grid', gridStyle: 'fill', size: [.055, .055], vx: .04, vy: .006, spin: 0, tw: 0, a: .075 },
-    { name: 'DICE',      e: '🎲', hue: 230, n: 14, size: [.04, .07], vx: 0, vy: .06, sway: .01, spin: 1.2, tw: 0, a: .12, style: 'fill' },
-    { name: 'DONUT',     e: '🍩', hue: 312, n: 12, size: [.05, .09], vx: -.015, vy: .015, sway: 0, spin: .5, tw: 0, a: .13, style: 'line' },
-    { name: 'BEAT',      e: '🎧', hue: 190, n: 10, size: [.035, .06], vx: 0, vy: 0, sway: .01, spin: 0, tw: 2.4, a: .12, style: 'fill',
+    { name: 'GLITCH',  e: '👾', hue: 150, layout: 'grid', gridStyle: 'fill', size: [.055, .055], vx: .04, vy: .006, spin: 0, tw: 0, a: .075 },
+    { name: 'JACKPOT',      e: '🎲', hue: 230, n: 14, size: [.04, .07], vx: 0, vy: .06, sway: .01, spin: 1.2, tw: 0, a: .12, style: 'fill' },
+    { name: 'SUGAR RUSH',     e: '🍩', hue: 312, n: 12, size: [.05, .09], vx: -.015, vy: .015, sway: 0, spin: .5, tw: 0, a: .13, style: 'line' },
+    { name: 'BASSLINE',      e: '🎧', hue: 190, n: 10, size: [.035, .06], vx: 0, vy: 0, sway: .01, spin: 0, tw: 2.4, a: .12, style: 'fill',
       hero: { x: .5, y: .52, s: .75, a: .07, bob: 0, spin: 0, pulse: 4 } },
     { name: 'PRISM',     e: '🌈', hue: 260, n: 8,  size: [.04, .07], vx: .008, vy: 0, sway: .01, spin: 0, tw: 1.2, a: .11, style: 'fill',
       hero: { x: .5, y: .8, s: 1.15, a: .075, bob: .008, spin: 0 } },
@@ -508,44 +507,44 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     { name: 'VORTEX',    e: '🌀', hue: 268, n: 12, size: [.025, .05], orbit: true, tw: 0, a: .14, style: 'line',
       hero: { x: .5, y: .5, s: .8, a: .07, bob: 0, spin: .5 } },
     { name: 'SCHOOL',    e: '🐟', hue: 185, n: 16, size: [.035, .06], vx: -.07, vy: .004, sway: .008, spin: 0, tw: 0, a: .12, style: 'fill' },
-    { name: 'BALLOON',   e: '🎈', hue: 300, n: 12, size: [.05, .09], vx: 0, vy: -.04, sway: .02, spin: 0, tw: 0, a: .12, style: 'fill' },
-    { name: 'SKYLINE',   e: '☁️', hue: 215, n: 7,  size: [.14, .22], vx: .015, vy: 0, sway: 0, spin: 0, tw: 0, a: .07, style: 'fill' },
-    { name: 'BLOOM',     e: '🌻', hue: 48,  layout: 'grid', size: [.065, .065], vx: 0, vy: -.01, spin: .2, tw: .8, a: .09 },
-    { name: 'CANDY',     e: '🍭', hue: 322, n: 14, size: [.04, .07], vx: 0, vy: .03, sway: .01, spin: 1.5, tw: 0, a: .13, style: 'line' },
+    { name: 'SKYWARD',   e: '🎈', hue: 300, n: 12, size: [.05, .09], vx: 0, vy: -.04, sway: .02, spin: 0, tw: 0, a: .12, style: 'fill' },
+    { name: 'NEBULA',   e: '☁️', hue: 215, n: 7,  size: [.14, .22], vx: .015, vy: 0, sway: 0, spin: 0, tw: 0, a: .07, style: 'fill' },
+    { name: 'SUNBURST',     e: '🌻', hue: 48,  layout: 'grid', size: [.065, .065], vx: 0, vy: -.01, spin: .2, tw: .8, a: .09 },
+    { name: 'SUGARPOP',     e: '🍭', hue: 322, n: 14, size: [.04, .07], vx: 0, vy: .03, sway: .01, spin: 1.5, tw: 0, a: .13, style: 'line' },
     { name: 'ARCADE',    e: '🎮', hue: 160, layout: 'grid', size: [.065, .065], vx: .02, vy: -.01, spin: 0, tw: .5, a: .08 },
-    { name: 'UNICORN',   e: '🦄', hue: 290, n: 14, size: [.03, .05], vx: 0, vy: .004, sway: .005, spin: 0, tw: 1.8, a: .12, style: 'fill',
+    { name: 'MYTHIC',   e: '🦄', hue: 290, n: 14, size: [.03, .05], vx: 0, vy: .004, sway: .005, spin: 0, tw: 1.8, a: .12, style: 'fill',
       hero: { x: .5, y: .45, s: .7, a: .07, bob: .02, spin: 0 } },
-    { name: 'CROWN',     e: '👑', hue: 45,  n: 10, size: [.035, .06], vx: 0, vy: .01, sway: .008, spin: 0, tw: 1.4, a: .12, style: 'fill',
+    { name: 'SOVEREIGN',     e: '👑', hue: 45,  n: 10, size: [.035, .06], vx: 0, vy: .01, sway: .008, spin: 0, tw: 1.4, a: .12, style: 'fill',
       hero: { x: .5, y: .3, s: .62, a: .075, bob: .01, spin: 0 } },
-    { name: 'COMET',     e: '💫', hue: 200, n: 14, size: [.04, .07], vx: -.12, vy: .08, sway: 0, spin: .2, tw: 0, a: .14, style: 'fill' },
-    { name: 'TROPHY',    e: '🏆', hue: 275, n: 12, size: [.03, .05], orbit: true, tw: 1.2, a: .14, style: 'line',
+    { name: 'SUPERNOVA',     e: '💫', hue: 200, n: 14, size: [.04, .07], vx: -.12, vy: .08, sway: 0, spin: .2, tw: 0, a: .14, style: 'fill' },
+    { name: 'GLORY',    e: '🏆', hue: 275, n: 12, size: [.03, .05], orbit: true, tw: 1.2, a: .14, style: 'line',
       hero: { x: .5, y: .5, s: .9, a: .08, bob: 0, spin: 0, pulse: 1.2 } },
-    { name: 'OCTOPUS',   e: '🐙', hue: 250, n: 10, size: [.05, .09], vx: 0, vy: -.02, sway: .03, spin: .15, tw: 0, a: .12, style: 'fill' },
-    { name: 'GUITAR',    e: '🎸', hue: 205, layout: 'grid', size: [.07, .07], vx: .015, vy: 0, spin: .1, tw: .7, a: .11 },
-    { name: 'PAWS',      e: '🐾', hue: 30,  layout: 'grid', gridStyle: 'fill', size: [.05, .05], vx: .02, vy: -.03, spin: 0, tw: 0, a: .075 },
-    { name: 'ANCHOR',    e: '⚓', hue: 215, n: 10, size: [.035, .06], vx: 0, vy: .03, sway: .01, spin: .2, tw: 0, a: .11, style: 'fill',
+    { name: 'KRAKEN',   e: '🐙', hue: 250, n: 10, size: [.05, .09], vx: 0, vy: -.02, sway: .03, spin: .15, tw: 0, a: .12, style: 'fill' },
+    { name: 'OVERDRIVE',    e: '🎸', hue: 205, layout: 'grid', size: [.07, .07], vx: .015, vy: 0, spin: .1, tw: .7, a: .11 },
+    { name: 'PROWL',      e: '🐾', hue: 30,  layout: 'grid', gridStyle: 'fill', size: [.05, .05], vx: .02, vy: -.03, spin: 0, tw: 0, a: .075 },
+    { name: 'UNDERTOW',    e: '⚓', hue: 215, n: 10, size: [.035, .06], vx: 0, vy: .03, sway: .01, spin: .2, tw: 0, a: .11, style: 'fill',
       hero: { x: .5, y: .55, s: .7, a: .07, bob: .015, spin: 0 } },
-    { name: 'MAPLE',     e: '🍁', hue: 25,  n: 18, size: [.04, .075], vx: .02, vy: .05, sway: .035, spin: .9, tw: 0, a: .12, style: 'fill' },
-    { name: 'PALM',      e: '🌴', hue: 120, n: 8,  size: [.04, .07], vx: .01, vy: 0, sway: .02, spin: 0, tw: .8, a: .11, style: 'fill',
+    { name: 'EMBERFALL',     e: '🍁', hue: 25,  n: 18, size: [.04, .075], vx: .02, vy: .05, sway: .035, spin: .9, tw: 0, a: .12, style: 'fill' },
+    { name: 'PARADISE',      e: '🌴', hue: 120, n: 8,  size: [.04, .07], vx: .01, vy: 0, sway: .02, spin: 0, tw: .8, a: .11, style: 'fill',
       hero: { x: .7, y: .62, s: .85, a: .07, bob: .01, spin: 0 } },
-    { name: 'GHOST',     e: '👻', hue: 265, n: 12, size: [.045, .08], vx: 0, vy: -.025, sway: .03, spin: 0, tw: 1.0, a: .12, style: 'line' },
-    { name: 'BUZZ',      e: '🐝', hue: 52,  n: 14, size: [.03, .05], vx: .05, vy: .01, sway: .09, spin: 0, tw: 0, a: .13, style: 'fill' },
-    { name: 'KEYS',      e: '🔑', hue: 45,  n: 14, size: [.035, .06], vx: 0, vy: .045, sway: .01, spin: 1.0, tw: 0, a: .12, style: 'line' },
-    { name: 'PUZZLE',    e: '🧩', hue: 190, layout: 'grid', gridStyle: 'fill', size: [.06, .06], vx: 0, vy: .012, spin: 0, tw: .5, a: .095 },
-    { name: 'DRAGON',    e: '🐉', hue: 140, n: 8,  size: [.035, .06], vx: -.01, vy: 0, sway: .01, spin: 0, tw: 1.2, a: .11, style: 'fill',
+    { name: 'PHANTOM',     e: '👻', hue: 265, n: 12, size: [.045, .08], vx: 0, vy: -.025, sway: .03, spin: 0, tw: 1.0, a: .12, style: 'line' },
+    { name: 'HIVEMIND',      e: '🐝', hue: 52,  n: 14, size: [.03, .05], vx: .05, vy: .01, sway: .09, spin: 0, tw: 0, a: .13, style: 'fill' },
+    { name: 'UNLOCKED',      e: '🔑', hue: 45,  n: 14, size: [.035, .06], vx: 0, vy: .045, sway: .01, spin: 1.0, tw: 0, a: .12, style: 'line' },
+    { name: 'ENIGMA',    e: '🧩', hue: 190, layout: 'grid', gridStyle: 'fill', size: [.06, .06], vx: 0, vy: .012, spin: 0, tw: .5, a: .095 },
+    { name: 'SHENLONG',    e: '🐉', hue: 140, n: 8,  size: [.035, .06], vx: -.01, vy: 0, sway: .01, spin: 0, tw: 1.2, a: .11, style: 'fill',
       hero: { x: .5, y: .5, s: .95, a: .07, bob: .012, spin: 0 } },
     { name: 'ENCORE',    e: '🎤', hue: 300, n: 10, size: [.035, .06], vx: 0, vy: -.02, sway: .015, spin: .3, tw: 0, a: .12, style: 'fill',
       hero: { x: .5, y: .5, s: .7, a: .07, bob: 0, spin: 0, pulse: 3 } },
-    { name: 'SHARK',     e: '🦈', hue: 200, n: 10, size: [.06, .1], vx: -.09, vy: 0, sway: .005, spin: 0, tw: 0, a: .11, style: 'fill' },
-    { name: 'JET',       e: '✈️', hue: 210, n: 10, size: [.04, .07], vx: .1, vy: -.03, sway: 0, spin: 0, tw: 0, a: .16, style: 'line' },
-    { name: 'DOVE',      e: '🕊️', hue: 220, n: 12, size: [.045, .08], vx: .015, vy: -.03, sway: .04, spin: .1, tw: 0, a: .12, style: 'fill' },
-    { name: 'SPORE',     e: '🍄', hue: 330, layout: 'grid', size: [.065, .065], vx: -.01, vy: -.008, spin: .15, tw: .9, a: .11 },
-    { name: 'JURASSIC',  e: '🦖', hue: 110, n: 8,  size: [.035, .06], vx: .02, vy: 0, sway: .005, spin: 0, tw: 0, a: .11, style: 'fill',
+    { name: 'APEX',     e: '🦈', hue: 200, n: 10, size: [.06, .1], vx: -.09, vy: 0, sway: .005, spin: 0, tw: 0, a: .11, style: 'fill' },
+    { name: 'JETSTREAM',       e: '✈️', hue: 210, n: 10, size: [.04, .07], vx: .1, vy: -.03, sway: 0, spin: 0, tw: 0, a: .16, style: 'line' },
+    { name: 'SERENITY',      e: '🕊️', hue: 220, n: 12, size: [.045, .08], vx: .015, vy: -.03, sway: .04, spin: .1, tw: 0, a: .12, style: 'fill' },
+    { name: 'WONDERLAND',     e: '🍄', hue: 330, layout: 'grid', size: [.065, .065], vx: -.01, vy: -.008, spin: .15, tw: .9, a: .11 },
+    { name: 'PRIMEVAL',  e: '🦖', hue: 110, n: 8,  size: [.035, .06], vx: .02, vy: 0, sway: .005, spin: 0, tw: 0, a: .11, style: 'fill',
       hero: { x: .4, y: .6, s: .9, a: .07, bob: .01, spin: 0 } },
-    { name: 'DEEP SEA',  e: '🐳', hue: 205, n: 12, size: [.03, .05], vx: 0, vy: -.03, sway: .015, spin: 0, tw: 0, a: .11, style: 'fill', fadeUp: true,
+    { name: 'ABYSS',  e: '🐳', hue: 205, n: 12, size: [.03, .05], vx: 0, vy: -.03, sway: .015, spin: 0, tw: 0, a: .11, style: 'fill', fadeUp: true,
       hero: { x: .5, y: .55, s: .9, a: .07, bob: .02, spin: 0 } },
-    { name: 'SPARK',     e: '💡', hue: 55,  n: 12, size: [.05, .09], vx: 0, vy: 0, sway: 0, spin: 0, tw: 0, a: .12, style: 'line', flicker: true },
-    { name: 'FIESTA',    e: '🎉', hue: 300, n: 14, size: [.03, .05], orbit: true, tw: 1.5, a: .14, style: 'fill',
+    { name: 'EUREKA',     e: '💡', hue: 55,  n: 12, size: [.05, .09], vx: 0, vy: 0, sway: 0, spin: 0, tw: 0, a: .12, style: 'line', flicker: true },
+    { name: 'FESTA',    e: '🎉', hue: 300, n: 14, size: [.03, .05], orbit: true, tw: 1.5, a: .14, style: 'fill',
       hero: { x: .5, y: .5, s: .8, a: .08, bob: 0, spin: .2, pulse: 2 } }
   ];
 
@@ -803,8 +802,14 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   function showBanner({ kind, emoji = '', top = '', main = '', sub = '', dur }) {
     $('bEmoji').textContent = emoji; $('bTop').textContent = top; $('bMain').textContent = main; $('bSub').textContent = sub;
     $('bEmoji').hidden = !emoji; $('bTop').hidden = !top; $('bSub').hidden = !sub;
-    bannerEl.classList.remove('pop', 'out', 'next', 'clear'); void bannerEl.offsetWidth;
-    bannerEl.classList.add('pop', kind);
+    bannerEl.classList.remove('pop', 'out', 'next', 'clear');
+    bannerEl.classList.add(kind);
+    // 長いレベル名（INSERT COIN など）は帯の幅に収まるよう文字を縮める（登場アニメーション前の最終状態で測る）
+    const bm = $('bMain'); bm.style.fontSize = '';
+    const maxW = bannerEl.clientWidth - 32;
+    if (maxW > 0 && bm.scrollWidth > maxW) bm.style.fontSize = (parseFloat(getComputedStyle(bm).fontSize) * maxW / bm.scrollWidth) + 'px';
+    void bannerEl.offsetWidth;
+    bannerEl.classList.add('pop');
     bannerLeft = dur;
   }
   // レベル開始の演出：大きなモチーフ名＋光の帯＋横に走る光の粒
@@ -926,9 +931,6 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     $('pbApples').textContent = rec.apples.toLocaleString();
     $('pbTime').textContent = fmtTime(rec.time, true);
     $('best').textContent = best.toLocaleString();
-    $('diag').textContent = diagText();
-    $('diag').classList.toggle('warn', !!(diag.cancel || diag.stall || diag.away || gestureN));
-    try { console.log('[AppleDrop diag]', JSON.stringify(diag), tapLog.slice(-20)); } catch (e) {}
     updateTitleBest();
     const btn = $('retry'); btn.disabled = true;
     $('over').hidden = false;
