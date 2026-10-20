@@ -250,8 +250,29 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .col-list li.locked .clv, .col-list li.locked .nm { color: var(--dim); }
 .col-list li.locked .clv { border-color: rgba(255,255,255,.12); background: transparent; }
 .col-list li.locked .em { filter: grayscale(1) opacity(.45); }
-.col-list li.now { border-color: var(--c); box-shadow: 0 0 14px color-mix(in srgb, var(--c) 35%, transparent); }
-.col-list li.now .nm::after { content: "  ★"; color: var(--c); }
+.col-list li[data-lv] { cursor: pointer; transition: transform .08s, background .15s; }
+.col-list li[data-lv]:active { transform: scale(.98); background: rgba(255,255,255,.08); }
+.col-list li[data-lv]:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+.col-detail {
+  position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: radial-gradient(90% 70% at 50% 45%, color-mix(in srgb, var(--c) 22%, rgba(10,9,18,.9)), rgba(10,9,18,.96));
+  animation: fade .2s ease-out;
+}
+.cd-card { display: grid; justify-items: center; gap: 10px; text-align: center; }
+.cd-art { position: relative; width: calc(var(--u) * 70); aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; }
+.cd-line { position: absolute; inset: -18%; display: grid; place-items: center; opacity: .5; animation: cdBreath 3s ease-in-out infinite alternate; }
+@keyframes cdBreath { from { transform: scale(.96); opacity: .35; } to { transform: scale(1.04); opacity: .6; } }
+.cd-line canvas { width: 100%; height: 100%; }
+@keyframes cdSpin { to { transform: rotate(360deg); } }
+.cd-emoji { position: relative; font-size: calc(var(--u) * 34); line-height: 1;
+  filter: drop-shadow(0 0 22px var(--c)) drop-shadow(0 0 6px var(--c));
+  animation: cdPop .5s cubic-bezier(.2, 1.6, .4, 1), cdFloat 3s ease-in-out .5s infinite alternate; }
+@keyframes cdPop { from { transform: scale(.3) rotate(-20deg); opacity: 0; } }
+@keyframes cdFloat { to { transform: translateY(-8px) rotate(-3deg); } }
+.cd-lv { font: 800 calc(var(--u) * 6)/1 var(--f-display); color: var(--c); letter-spacing: .04em; text-shadow: 0 0 16px var(--c); }
+.cd-name { font: 800 calc(var(--u) * 10)/1.05 var(--f-display); color: var(--ink); letter-spacing: .04em; white-space: nowrap;
+  text-shadow: 0 0 8px var(--c), 0 0 30px var(--c); margin-bottom: 14px; }
+@media (prefers-reduced-motion: reduce) { .cd-line, .cd-emoji { animation: none; } }
 .start-group { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .btn {
   font: 800 17px var(--f-display); letter-spacing: .08em; color: #0a0912; background: var(--ink);
@@ -395,6 +416,14 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     </div>
     <ol class="col-list" id="colList"></ol>
     <button class="btn-sub" id="colClose" type="button">CLOSE</button>
+    <div class="col-detail" id="colDetail" hidden>
+      <div class="cd-card" role="dialog" aria-label="称号">
+        <div class="cd-art"><div class="cd-line" id="cdLine"></div><div class="cd-emoji" id="cdEmoji"></div></div>
+        <div class="cd-lv" id="cdLv">Lv.1</div>
+        <div class="cd-name" id="cdName">STARLIGHT</div>
+        <button class="btn-sub" id="cdClose" type="button">CLOSE</button>
+      </div>
+    </div>
   </div>
 
   <div class="overlay over" id="over" hidden>
@@ -1072,7 +1101,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
       const li = document.createElement('li'), got = lv <= bestLv, th = themeOf(lv);
       li.style.setProperty('--c', `hsl(${themeHue(lv)},95%,68%)`);
       if (!got) li.classList.add('locked');
-      if (got && lv === Math.min(bestLv, TOTAL_TITLES)) li.classList.add('now');
+      if (got) { li.dataset.lv = lv; li.tabIndex = 0; li.setAttribute('role', 'button'); }
+      if (got && lv === Math.min(bestLv, TOTAL_TITLES)) li.dataset.last = '1';   // 開いたときのスクロール位置用（見た目は変えない）
       const a = document.createElement('span'); a.className = 'clv'; a.textContent = (isInf(lv) && !got) ? '？？？' : lvLabel(lv);   // Lv.∞ は未到達ならレベル表記も伏せる
       const b = document.createElement('span'); b.className = 'em'; b.textContent = got ? th.e : '❔';
       const c = document.createElement('span'); c.className = 'nm'; c.textContent = got ? th.name : '？？？';
@@ -1085,11 +1115,27 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     audioOn(); tone(660, .06, 'triangle', .08, 880);
     renderCollection();
     $('collection').hidden = false;
-    const now = $('colList').querySelector('.now');   // 現在の称号が見えるところまでスクロール
+    const now = $('colList').querySelector('[data-last]');   // 取得済みの最後の称号が見えるところまでスクロール
     if (now) now.scrollIntoView({ block: 'center' });
     else $('colList').scrollTop = 0;
   }
-  function closeCollection() { $('collection').hidden = true; }
+  function closeCollection() { $('colDetail').hidden = true; $('collection').hidden = true; }
+  function openTitleDetail(lv) {
+    const th = themeOf(lv), color = `hsl(${themeHue(lv)},95%,68%)`;
+    const d = $('colDetail'); d.style.setProperty('--c', color);
+    $('cdEmoji').textContent = th.e;
+    $('cdLv').textContent = lvLabel(lv);
+    $('cdName').textContent = th.name;
+    const line = $('cdLine'); line.textContent = ''; line.appendChild(tintSprite(th.e, color, true));   // 背景にネオンの輪郭
+    d.hidden = false;
+    const nm = $('cdName'); nm.style.fontSize = '';                    // 長い名前は幅に収める
+    const maxW = d.clientWidth - 40; if (maxW > 0 && nm.scrollWidth > maxW) nm.style.fontSize = (parseFloat(getComputedStyle(nm).fontSize) * maxW / nm.scrollWidth) + 'px';
+    tone(880, .08, 'triangle', .08, 1320);
+  }
+  $('colList').addEventListener('click', e => { const li = e.target.closest('li[data-lv]'); if (li) openTitleDetail(+li.dataset.lv); });
+  $('colList').addEventListener('keydown', e => { const li = e.target.closest('li[data-lv]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openTitleDetail(+li.dataset.lv); } });
+  $('cdClose').addEventListener('click', e => { e.stopPropagation(); $('colDetail').hidden = true; });
+  $('colDetail').addEventListener('click', e => { if (e.target === $('colDetail')) $('colDetail').hidden = true; });
   $('rank').addEventListener('click', openCollection);
   $('rank').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCollection(); } });
   $('colClose').addEventListener('click', closeCollection);
