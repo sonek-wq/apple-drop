@@ -1095,7 +1095,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     if (dup >= 0) { recentTaps.splice(dup, 1); return; }   // 同じタッチの2通目（1回だけ相殺）
     recentTaps.push({ x: clientX, y: clientY, t: now, src });
     const cr = cv.getBoundingClientRect();
-    if (clientX < cr.left || clientX > cr.right || clientY < cr.top || clientY > cr.bottom) return;
+    if (clientX < cr.left || clientX > cr.right || clientY < cr.top || clientY > cr.bottom + 30) return;   // 下端の少し外まで有効
     handleTap(clientX, clientY, pid, now);
   }
   document.addEventListener('pointerdown', e => {
@@ -1186,14 +1186,20 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
       o.x += o.vx * sdt; o.y += o.vy * sdt; o.rot += o.vr * sdt;
       if (o.x < o.r) { o.x = o.r; o.vx = Math.abs(o.vx) * .96; o.vr = -o.vr; wallHit(o, 0); }
       else if (o.x > W - o.r) { o.x = W - o.r; o.vx = -Math.abs(o.vx) * .96; o.vr = -o.vr; wallHit(o, W); }
-      if (o.type === 'apple' && o.y + o.r * .2 > H && state === 'play') die('miss', o);
+      // 落下判定：りんごの「当たり判定（広めの範囲）」が画面内から完全に消えたときに初めてアウト。
+      // 当たり判定が画面に少しでも残っていれば、ぎりぎりでもタップで取れる。
+      // （タップ判定は0.07秒前の位置でも当たるので、その位置の当たり判定も消えるまで待つ）
+      if (o.type === 'apple' && state === 'play') {
+        const lagY = o.y - o.vy * HIT_LAG * (typeof speed === 'number' ? speed : 1);
+        if (Math.min(o.y, lagY) - o.r * HIT_APPLE > H) die('miss', o);
+      }
       if (o.type === 'bomb' && Math.random() < dt * timeScale * 22 * (speed < 1 ? .5 : 1)) {
         const a = o.rot - Math.PI / 4;
         parts.push({ x: o.x + Math.cos(a) * o.r * .75, y: o.y + Math.sin(a) * o.r * .75, vx: rand(-30, 30), vy: rand(-60, -10),
           life: .3, max: .3, c: Math.random() < .5 ? '255,226,120' : '255,140,40', s: rand(1.5, 3) });
       }
     }
-    objs = objs.filter(o => o.dead ? false : o.y - o.r < H + 10);
+    objs = objs.filter(o => o.dead ? false : o.y - o.r * HIT_APPLE < H + 40);
 
     // 残りりんごチェック（出現停止後）
     if (state === 'play' && phase === 'sweep') {
