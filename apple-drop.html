@@ -26,9 +26,11 @@
   --theme-soft: hsla(270, 95%, 68%, .16);
   --f-display: "Unbounded", "Arial Black", system-ui, sans-serif;
   --f-ui: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, sans-serif;
+  --u: 1vw;   /* ステージ幅の1/92（スマホでは画面幅の約1%）。JSで更新 */
   color-scheme: dark;
 }
 [hidden] { display: none !important; }
+.hud, .banner, .sweep, .slowchip, .timer, .overlay > * { zoom: var(--z, 1); }
 html, body { height: 100%; overflow: hidden; overscroll-behavior: none; touch-action: none; }   /* ページ全体でピンチ・ダブルタップ拡大を無効化 */
 body {
   margin: 0;
@@ -135,12 +137,12 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   background: linear-gradient(90deg, transparent, var(--theme), transparent); box-shadow: 0 0 12px var(--theme);
 }
 .b-band::before { top: 0; } .b-band::after { bottom: 0; }
-.b-emoji { font-size: clamp(56px, 19vw, 84px); line-height: 1; filter: drop-shadow(0 0 18px var(--theme)) drop-shadow(0 0 4px var(--theme)); }
-.b-top { font: 800 clamp(20px, 6.5vw, 28px)/1 var(--f-display); color: var(--theme); letter-spacing: .06em;
+.b-emoji { font-size: clamp(56px, calc(var(--u) * 19), 84px); line-height: 1; filter: drop-shadow(0 0 18px var(--theme)) drop-shadow(0 0 4px var(--theme)); }
+.b-top { font: 800 clamp(20px, calc(var(--u) * 6.5), 28px)/1 var(--f-display); color: var(--theme); letter-spacing: .06em;
   text-shadow: 0 0 16px var(--theme); }
-.b-main { font: 800 clamp(30px, 10.5vw, 48px)/1.05 var(--f-display); color: var(--ink); letter-spacing: .04em; white-space: nowrap;
+.b-main { font: 800 clamp(30px, calc(var(--u) * 10.5), 48px)/1.05 var(--f-display); color: var(--ink); letter-spacing: .04em; white-space: nowrap;
   text-shadow: 0 2px 0 rgba(0,0,0,.35), 0 0 8px var(--theme), 0 0 30px var(--theme); }
-.banner.clear .b-main { font-size: clamp(46px, 16vw, 68px); letter-spacing: -.01em; }
+.banner.clear .b-main { font-size: clamp(46px, calc(var(--u) * 16), 68px); letter-spacing: -.01em; }
 .b-sub { font: 500 10px var(--f-display); letter-spacing: .5em; color: var(--ink); opacity: .75; margin-top: 2px; padding-left: .5em; }
 .banner.pop .b-band { animation: bandIn .45s cubic-bezier(.2, .9, .3, 1); }
 .banner.pop .b-emoji { animation: emojiIn .6s cubic-bezier(.2, 1.7, .4, 1); }
@@ -163,7 +165,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   animation: fade .25s ease-out;
 }
 @keyframes fade { from { opacity: 0; } }
-.logo { font-family: var(--f-display); font-weight: 800; font-size: clamp(38px, 13vw, 58px); line-height: .92; letter-spacing: -.02em; }
+.logo { font-family: var(--f-display); font-weight: 800; font-size: clamp(38px, calc(var(--u) * 13), 58px); line-height: .92; letter-spacing: -.02em; }
 .logo .a { color: var(--apple); text-shadow: 0 0 24px rgba(255,61,110,.7); display: block; }
 .logo .d { -webkit-text-stroke: 1.5px var(--cyan); color: transparent; text-shadow: 0 0 22px rgba(61,224,255,.35); display: block; }
 .mode { font: 500 10px var(--f-display); letter-spacing: .4em; color: var(--theme); margin-top: -10px; }
@@ -173,7 +175,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .rules .e .x { font: 800 13px var(--f-display); color: var(--ink); margin-left: 1px; vertical-align: middle; }
 .rules b { color: var(--apple); font-family: var(--f-display); font-size: 13px; }
 .rules .ng { color: var(--bomb); }
-.rules .note { display: block; font-size: 11px; color: var(--dim); margin-top: 1px; }
+.rules .note { font-size: 11px; color: var(--dim); margin-left: 2px; }
+.rules .tap { white-space: nowrap; }
 .rules .slw { word-break: keep-all; overflow-wrap: anywhere; }
 .rules .slw { color: var(--cyan); }
 .rules .e { white-space: nowrap; }
@@ -201,10 +204,10 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 /* ---------- game over ---------- */
 .overlay.over { justify-content: space-between; gap: 12px; padding: 18px 16px 14px; }
 .go-main { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 0; }
-.go-title { font: 800 clamp(34px, 11.5vw, 50px)/1 var(--f-display); letter-spacing: .02em; color: var(--apple);
+.go-title { font: 800 clamp(34px, calc(var(--u) * 11.5), 50px)/1 var(--f-display); letter-spacing: .02em; color: var(--apple);
   text-shadow: 0 0 6px rgba(255,61,110,.9), 0 0 32px rgba(255,61,110,.7); animation: slam .55s cubic-bezier(.2, 1.5, .4, 1); }
 @keyframes slam { 0% { transform: scale(2.4); opacity: 0; filter: blur(8px); } 60% { opacity: 1; filter: blur(0); } }
-.reason { font: 700 clamp(16px, 5vw, 19px)/1.3 var(--f-ui); color: var(--ink); margin-top: -4px;
+.reason { font: 700 clamp(16px, calc(var(--u) * 5), 19px)/1.3 var(--f-ui); color: var(--ink); margin-top: -4px;
   padding: 6px 14px; border-radius: 99px; background: rgba(255,61,110,.12); border: 1px solid rgba(255,61,110,.35); }
 .reason.bomb { background: rgba(255,176,32,.12); border-color: rgba(255,176,32,.4); }
 
@@ -215,7 +218,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   box-shadow: 0 0 0 1px var(--theme-soft) inset, 0 10px 30px rgba(0,0,0,.3);
 }
 .run-label { font: 500 9px var(--f-display); letter-spacing: .3em; color: var(--dim); }
-.final { font-family: var(--f-display); font-weight: 800; font-size: clamp(46px, 15vw, 66px); line-height: 1; font-variant-numeric: tabular-nums;
+.final { font-family: var(--f-display); font-weight: 800; font-size: clamp(46px, calc(var(--u) * 15), 66px); line-height: 1; font-variant-numeric: tabular-nums;
   text-shadow: 0 0 26px rgba(255,61,110,.55); margin-top: -2px; }
 .newbest { font: 800 10px var(--f-display); letter-spacing: .2em; color: #0a0912; background: var(--cyan); padding: 5px 11px; border-radius: 99px;
   box-shadow: 0 0 24px rgba(61,224,255,.7); animation: pulse 1s ease-in-out infinite alternate; margin-top: -2px; }
@@ -288,7 +291,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   <div class="overlay" id="title">
     <div class="logo"><span class="a">APPLE</span><span class="d">DROP</span></div>
     <div class="rules">
-      <div><span class="e">🍎</span><span>タップで <b>+100</b><small class="note">（連鎖ボーナスあり）</small></span></div>
+      <div><span class="e">🍎</span><span class="tap">タップで <b>+100</b><small class="note">（連鎖ボーナスあり）</small></span></div>
       <div><span class="e">🍎<span class="x">×2</span></span><span class="slw">同時タップで<wbr>スローモーション発動！</span></div>
       <div><span class="e">💣</span><span class="ng">タップしたら終わり</span></div>
       <div><span class="e">⬇︎</span><span>りんごを落としても終わり</span></div>
@@ -366,6 +369,10 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     R = clamp(W * 0.085, 24, 42);
+    // iPadなど大きな画面では、文字やボタンの UI 一式をスマホと同じ比率のまま拡大する
+    const z = clamp(W / 360, 1, 2.2);
+    stage.style.setProperty('--z', z);
+    stage.style.setProperty('--u', (W / z / 92) + 'px');
   }
   new ResizeObserver(resize).observe(stage);
   resize();
@@ -934,12 +941,17 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     updateTitleBest();
     const btn = $('retry'); btn.disabled = true;
     $('over').hidden = false;
+    fitText($('final'), $('final').parentElement.clientWidth - 28);
     setTimeout(() => { btn.disabled = false; }, 450);
   }
   function fmtTime(s, plain) {
     const m = Math.floor(s / 60), r = s % 60;
     if (plain) return m ? `${m}m ${r}s` : `${r}s`;
     return m ? `${m}<small>m</small> ${r}<small>s</small>` : `${r}<small>s</small>`;
+  }
+  function fitText(el, maxW) {
+    el.style.fontSize = '';
+    if (maxW > 0 && el.scrollWidth > maxW) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * maxW / el.scrollWidth) + 'px';
   }
   function updateTitleBest() {
     $('titleBest').textContent = 'BEST ' + best.toLocaleString() + (bestLv ? '  ・  最高 Lv.' + bestLv : '');
