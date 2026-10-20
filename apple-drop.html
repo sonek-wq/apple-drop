@@ -183,6 +183,33 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .rules .slw { color: var(--cyan); }
 .rules .e { white-space: nowrap; }
 .rules .lvl { color: var(--theme); }
+.overlay.titlescr { justify-content: space-between; gap: 14px; padding: 22px 16px 16px; }
+.title-main { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; min-height: 0; }
+.rank {
+  --rank: var(--cyan);
+  width: 100%; max-width: 330px; box-sizing: border-box; display: grid; gap: 8px; padding: 12px 16px 12px;
+  border-radius: 20px; text-align: left;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--rank) 16%, transparent), rgba(255,255,255,.03));
+  border: 1px solid color-mix(in srgb, var(--rank) 55%, transparent);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--rank) 25%, transparent), inset 0 0 18px color-mix(in srgb, var(--rank) 10%, transparent);
+}
+.rank-label { font: 500 9px var(--f-display); letter-spacing: .26em; color: var(--dim); text-align: center; }
+.rank-body { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.rank-emoji { font-size: calc(var(--u) * 15); line-height: 1; flex: none;
+  filter: drop-shadow(0 0 14px var(--rank)) drop-shadow(0 0 3px var(--rank)); animation: rankFloat 3s ease-in-out infinite alternate; }
+@keyframes rankFloat { to { transform: translateY(-4px) rotate(-4deg); } }
+.rank-text { display: grid; gap: 4px; min-width: 0; }
+.rank-name { font: 800 calc(var(--u) * 7.4)/1.05 var(--f-display); letter-spacing: .03em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-shadow: 0 0 8px var(--rank), 0 0 22px color-mix(in srgb, var(--rank) 70%, transparent); }
+.rank-lv { font: 800 calc(var(--u) * 4.2)/1.2 var(--f-display); color: var(--rank); }
+.rank.empty .rank-name { font-size: calc(var(--u) * 5.2); color: var(--dim); text-shadow: none; }
+.rank.empty .rank-lv { font: 500 11px/1.4 var(--f-ui); color: var(--dim); }
+.rank.empty .rank-emoji { filter: grayscale(1) opacity(.5); animation: none; }
+.rank-score { display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  border-top: 1px solid rgba(255,255,255,.1); padding-top: 8px; }
+.rank-score span { font: 500 9px var(--f-display); letter-spacing: .22em; color: var(--dim); }
+.rank-score b { font: 800 calc(var(--u) * 6.2)/1 var(--f-display); color: var(--ink); font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 16px rgba(255,61,110,.45); }
 .start-group { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .btn {
   font: 800 17px var(--f-display); letter-spacing: .08em; color: #0a0912; background: var(--ink);
@@ -251,6 +278,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .diag.warn { color: var(--bomb); opacity: .9; }
 @media (prefers-reduced-motion: reduce) {
   .stage.slow .warp { animation: none; }
+  .rank-emoji,
   .newbest, .go-title, .overlay, .bump, .sweep, .banner.pop .b-main, .banner.pop .b-top, .banner.pop .b-sub, .banner.pop .b-band, .banner.pop .b-emoji { animation: none; }
 }
 </style>
@@ -289,7 +317,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     <div class="b-sub" id="bSub"></div>
   </div>
 
-  <div class="overlay" id="title">
+  <div class="overlay titlescr" id="title">
+    <div class="title-main">
     <div class="logo"><span class="a">APPLE</span><span class="d">DROP</span></div>
     <div class="rules">
       <div><span class="e">🍎</span><span class="tap">タップで <b>+100</b><small class="note">（連鎖ボーナスあり）</small></span></div>
@@ -301,7 +330,19 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
       <button class="btn" id="start" type="button">START</button>
       <button class="mute" id="mute" type="button" aria-pressed="true"><span class="dot"></span><span id="muteLabel">効果音 ON</span></button>
     </div>
-    <div class="small" id="titleBest">BEST 0</div>
+    </div>
+
+    <section class="rank" id="rank" aria-label="あなたの称号">
+      <div class="rank-label">YOUR TITLE ・ 最高到達レベル</div>
+      <div class="rank-body">
+        <div class="rank-emoji" id="rankEmoji">❔</div>
+        <div class="rank-text">
+          <div class="rank-name" id="rankName">NO TITLE YET</div>
+          <div class="rank-lv" id="rankLv">プレイして最初の称号を手に入れよう</div>
+        </div>
+      </div>
+      <div class="rank-score"><span>HIGH SCORE</span><b id="rankScore">0</b></div>
+    </section>
   </div>
 
   <div class="overlay over" id="over" hidden>
@@ -387,29 +428,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     x.fillText(ch, 80, 88);
     return c;
   }
-  // 重なっても1個ずつ見分けられるよう、「ステッカー風」の輪郭を付けたスプライト。
-  //   外側：細い色付きの縁（りんご＝ピンク、爆弾＝アンバー） → 内側：背景色の暗い隙間 → 絵文字
-  //   暗い隙間が、後ろのオブジェクトとの間に必ず境界線を作る
-  function outlinedSprite(ch, rim) {
-    const S = 240, c = document.createElement('canvas'); c.width = c.height = S;
-    const base = document.createElement('canvas'); base.width = base.height = S;
-    const b = base.getContext('2d');
-    b.textAlign = 'center'; b.textBaseline = 'middle'; b.font = '177px ' + EMOJI_FONT;
-    b.fillText(ch, S / 2, S / 2 + 12);
-    const mask = (color) => {
-      const m = document.createElement('canvas'); m.width = m.height = S;
-      const mx = m.getContext('2d'); mx.drawImage(base, 0, 0);
-      mx.globalCompositeOperation = 'source-in'; mx.fillStyle = color; mx.fillRect(0, 0, S, S);
-      return m;
-    };
-    const x = c.getContext('2d');
-    const dilate = (m, rad) => { for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2; x.drawImage(m, Math.cos(a) * rad, Math.sin(a) * rad); } };
-    dilate(mask(rim), 10.5);          // 色付きの縁
-    dilate(mask('#0b0a14'), 7);        // 暗い隙間
-    x.drawImage(base, 0, 0);           // 絵文字本体
-    return c;
-  }
-  const SPR = { apple: outlinedSprite('🍎', 'rgba(255,107,143,.95)'), bomb: outlinedSprite('💣', 'rgba(255,192,77,.95)') };
+  const SPR = { apple: sprite('🍎'), bomb: sprite('💣') };
 
   // ---------- audio ----------
   // iOS Safari は pointerdown / touchstart の時点ではまだ音声の再生許可が下りず、
@@ -977,7 +996,22 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     if (maxW > 0 && el.scrollWidth > maxW) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * maxW / el.scrollWidth) + 'px';
   }
   function updateTitleBest() {
-    $('titleBest').textContent = 'BEST ' + best.toLocaleString() + (bestLv ? '  ・  最高 Lv.' + bestLv : '');
+    const card = $('rank');
+    $('rankScore').textContent = best.toLocaleString();
+    if (bestLv > 0) {
+      const th = themeOf(bestLv), cycle = Math.floor((bestLv - 1) / THEMES.length);
+      card.classList.remove('empty');
+      card.style.setProperty('--rank', `hsl(${(th.hue + cycle * 47) % 360},95%,68%)`);
+      $('rankEmoji').textContent = th.e;
+      $('rankName').textContent = th.name;
+      $('rankLv').textContent = 'Lv.' + bestLv;
+    } else {
+      card.classList.add('empty');
+      card.style.removeProperty('--rank');
+      $('rankEmoji').textContent = '❔';
+      $('rankName').textContent = 'NO TITLE YET';
+      $('rankLv').textContent = 'プレイして最初の称号を手に入れよう';
+    }
   }
 
   // ---------- slow motion ----------
@@ -1259,7 +1293,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     if (glowCache[col]) return glowCache[col];
     const c = document.createElement('canvas'); c.width = c.height = 128;
     const x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 64 * (.2 / 1.9), 64, 64, 64);
-    g.addColorStop(0, `rgba(${col},.26)`); g.addColorStop(1, `rgba(${col},0)`);
+    g.addColorStop(0, `rgba(${col},.35)`); g.addColorStop(1, `rgba(${col},0)`);
     x.fillStyle = g; x.fillRect(0, 0, 128, 128);
     return (glowCache[col] = c);
   }
