@@ -87,9 +87,12 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .glass {
   display: flex; align-items: center; gap: 10px;
   padding: 5px 12px 5px 5px; border-radius: 99px;
-  background: rgba(14, 12, 26, .66); border: 1px solid rgba(255, 255, 255, .08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+  background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .12);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .12);
+  transition: opacity .18s ease;
 }
+.glass.dim { opacity: .28; }   /* 真下をりんご・爆弾が通っている間は透かして、見えにくさを防ぐ */
 .glass.right { padding: 6px 12px; }
 .hud .sc { display: grid; gap: 1px; }
 .hud .label { font-family: var(--f-display); font-size: 7.5px; letter-spacing: .22em; color: var(--dim); font-weight: 500; line-height: 1; }
@@ -277,7 +280,6 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     </div>
   </div>
 
-  <div class="slowchip off" id="slowchip" aria-live="polite">SLOW ×1/3<div class="bar"><i id="slowFill"></i></div></div>
   <div class="sweep" id="sweep" hidden>残りの🍎を全部消せ ・ あと <b id="sweepN">0</b></div>
 
   <div class="banner out" id="banner">
@@ -963,7 +965,6 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     if (slowT > 0) return;   // スロー中の再発動・延長はなし（解除後なら再び発動できる）
     slowT = SLOW_TIME;
     stageEl.classList.add('slow');
-    $('slowchip').classList.remove('off');
     sfx.slowIn();
     const cx = hits.reduce((a, h) => a + h.x, 0) / hits.length, cy = hits.reduce((a, h) => a + h.y, 0) / hits.length;
     ring(cx, cy, '61,224,255', W * .9, .9); ring(cx, cy, '160,110,255', W * .55, .7); ring(cx, cy, '255,255,255', W * .3, .45);
@@ -975,7 +976,6 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     if (slowT > 0 && !silent) sfx.slowOut();
     slowT = 0;
     stageEl.classList.remove('slow');
-    $('slowchip').classList.add('off');
   }
   window.addEventListener('pointerup', e => activePointers.delete('p' + e.pointerId), true);
   window.addEventListener('pointercancel', e => activePointers.delete('p' + e.pointerId), true);
@@ -1131,7 +1131,6 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     const target = slowT > 0 ? SLOW_FACTOR : 1;
     speed += (target - speed) * Math.min(1, dt * (target < speed ? 14 : 6));
     if (Math.abs(speed - target) < .002) speed = target;
-    $('slowFill').style.transform = `scaleX(${clamp(slowT / SLOW_TIME, 0, 1)})`;
     const gdt = dt * speed;                 // ゲーム進行用の時間（タイマー・出現・CHAIN猶予）
     const sdt = gdt * timeScale;            // オブジェクトの移動用
     gridOff = (gridOff + sdt * H * .08) % (W / 6);
@@ -1244,6 +1243,53 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     return (glowCache[col] = c);
   }
 
+  // ---------- スローの残り時間表示 ----------
+  // 背景に溶け込む大きな「SLOW」の文字（オブジェクトより奥に描く）
+  function drawSlowBackdrop() {
+    const vis = clamp((1 - speed) / (1 - SLOW_FACTOR), 0, 1);
+    if (vis <= .01) return;
+    const k = clamp(slowT / SLOW_TIME, 0, 1);
+    ctx.save();
+    ctx.globalAlpha = .08 * vis * (.4 + .6 * k);
+    ctx.fillStyle = '#3de0ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `800 ${W * .2}px Unbounded, "Arial Black", sans-serif`;
+    ctx.fillText('SLOW', W / 2, H * .5);
+    ctx.restore();
+  }
+  // 画面の左右の縁を走る光のライン。残り時間に合わせて上から短くなる（オブジェクトとは重ならない縁だけに表示）
+  function drawSlowEdges() {
+    const vis = clamp((1 - speed) / (1 - SLOW_FACTOR), 0, 1);
+    if (vis <= .01) return;
+    const k = clamp(slowT / SLOW_TIME, 0, 1), len = H * k, y0 = H - len;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = .9 * vis;
+    const g = ctx.createLinearGradient(0, y0, 0, H);
+    g.addColorStop(0, 'rgba(61,224,255,0)'); g.addColorStop(.15, 'rgba(61,224,255,.9)'); g.addColorStop(1, 'rgba(160,110,255,.9)');
+    ctx.fillStyle = g; ctx.shadowColor = '#3de0ff'; ctx.shadowBlur = 10;
+    ctx.fillRect(0, y0, 3, len); ctx.fillRect(W - 3, y0, 3, len);
+    ctx.restore();
+  }
+
+  // ---------- HUDの自動フェード ----------
+  const hudCaps = [...document.querySelectorAll('.hud .glass')];
+  let hudRects = [], hudRectT = 0;
+  function updateHudFade(now) {
+    if (now - hudRectT > 500 || !hudRects.length) {   // 位置は0.5秒ごとに取り直す（フォント読み込みや画面サイズ変更に追従）
+      const cr = cv.getBoundingClientRect();
+      hudRects = hudCaps.map(el => { const r = el.getBoundingClientRect(); return { x: r.left - cr.left, y: r.top - cr.top, w: r.width, h: r.height }; });
+      hudRectT = now;
+    }
+    hudCaps.forEach((el, i) => {
+      const r = hudRects[i]; let hit = false;
+      if (state === 'play' || state === 'dying') for (const o of objs) {
+        const rr = o.r * 1.1;
+        if (o.x + rr > r.x - 4 && o.x - rr < r.x + r.w + 4 && o.y + rr > r.y - 4 && o.y - rr < r.y + r.h + 4) { hit = true; break; }
+      }
+      if (el.classList.contains('dim') !== hit) el.classList.toggle('dim', hit);
+    });
+  }
+
   // ---------- draw ----------
   function draw() {
     ctx.save();
@@ -1254,6 +1300,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     ctx.fillStyle = '#0e0c1a'; ctx.fillRect(-30, -30, W + 60, H + 60);
     if (bgPrev) drawBg(bgPrev, 1 - bgMix);
     drawBg(bgCur, bgPrev ? bgMix : 1);
+    drawSlowBackdrop();
     ctx.globalAlpha = 1;
 
     // 危険ライン
@@ -1293,6 +1340,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
       ctx.drawImage(SPR[o.type], -s / 2, -s / 2, s, s);
       ctx.restore();
     }
+
+    drawSlowEdges();
 
     // パーティクル・リング
     ctx.globalCompositeOperation = 'lighter';
@@ -1356,6 +1405,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
     if (state === 'play' && !document.hidden && raw > .2) { diag.stall++; diag.maxStall = Math.max(diag.maxStall, raw); }
     const dt = Math.min(.05, raw);
     if (state === 'title') demo(dt);
+    updateHudFade(now);
     update(dt);
     draw();
     requestAnimationFrame(frame);
