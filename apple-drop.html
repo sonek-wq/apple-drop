@@ -168,7 +168,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   animation: fade .25s ease-out;
 }
 @keyframes fade { from { opacity: 0; } }
-.logo { font-family: var(--f-display); font-weight: 800; font-size: clamp(38px, calc(var(--u) * 13), 58px); line-height: .92; letter-spacing: -.02em; }
+.logo { font-family: var(--f-display); font-weight: 800; font-size: clamp(48px, calc(var(--u) * 18), 80px); line-height: .9; letter-spacing: -.02em; }
 .logo .a { color: var(--apple); text-shadow: 0 0 24px rgba(255,61,110,.7); display: block; }
 .logo .d { -webkit-text-stroke: 1.5px var(--cyan); color: transparent; text-shadow: 0 0 22px rgba(61,224,255,.35); display: block; }
 .mode { font: 500 10px var(--f-display); letter-spacing: .4em; color: var(--theme); margin-top: -10px; }
@@ -194,7 +194,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   border: 1px solid color-mix(in srgb, var(--rank) 55%, transparent);
   box-shadow: 0 0 26px color-mix(in srgb, var(--rank) 25%, transparent), inset 0 0 18px color-mix(in srgb, var(--rank) 10%, transparent);
 }
-.rank-label { font: 500 9px var(--f-display); letter-spacing: .26em; color: var(--dim); text-align: center; }
+.rank-label { font: 500 9px var(--f-display); letter-spacing: .18em; color: var(--dim); text-align: center; padding-inline: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rank-body { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .rank-emoji { font-size: calc(var(--u) * 15); line-height: 1; flex: none;
   filter: drop-shadow(0 0 14px var(--rank)) drop-shadow(0 0 3px var(--rank)); animation: rankFloat 3s ease-in-out infinite alternate; }
@@ -223,8 +223,33 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .rank { cursor: pointer; transition: transform .1s; -webkit-user-select: none; }
 .rank:active { transform: scale(.98); }
 .rank:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
-.rank-hint { font: 500 8.5px var(--f-display); letter-spacing: .18em; color: var(--dim); text-align: center; margin-top: -2px; }
-.rank-hint b { color: var(--ink); font-weight: 800; }
+.rank { position: relative; overflow: hidden; }
+/* カードの上をゆっくり流れる光（押せるカードであることを示す） */
+.rank::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.10) 50%, transparent 65%);
+  transform: translateX(-120%); animation: rankShine 3.6s ease-in-out 1s infinite;
+}
+@keyframes rankShine { 0% { transform: translateX(-120%); } 45%, 100% { transform: translateX(120%); } }
+/* 右上の丸い「›」ボタン */
+.rank-arrow {
+  position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center; font: 800 18px/1 var(--f-display); color: var(--rank);
+  background: color-mix(in srgb, var(--rank) 16%, transparent); border: 1px solid color-mix(in srgb, var(--rank) 60%, transparent);
+  animation: arrowNudge 1.6s ease-in-out infinite;
+}
+@keyframes arrowNudge { 50% { transform: translateX(3px); } }
+/* 下部のボタン風の帯 */
+.rank-cta {
+  display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px;
+  padding: 8px 12px; border-radius: 99px;
+  background: color-mix(in srgb, var(--rank) 18%, transparent); border: 1px solid color-mix(in srgb, var(--rank) 55%, transparent);
+  font: 800 10px var(--f-display); letter-spacing: .1em; color: var(--ink); white-space: nowrap;
+}
+.rank-cta .ic { font-size: 13px; letter-spacing: 0; }
+.rank-cta b { color: var(--rank); font-weight: 800; letter-spacing: .04em; }
+.rank-cta .go { font-size: 15px; color: var(--rank); margin-left: 2px; }
+.rank.empty .rank-arrow, .rank.empty .rank-cta { --rank: var(--cyan); }
 
 .overlay.col { z-index: 4; justify-content: flex-start; gap: 12px; padding: 22px 16px 16px; }
 .col-head { display: grid; gap: 4px; text-align: center; }
@@ -259,12 +284,12 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   animation: fade .2s ease-out;
 }
 .cd-card { display: grid; justify-items: center; gap: 10px; text-align: center; }
-.cd-art { position: relative; width: calc(var(--u) * 70); aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; }
-.cd-line { position: absolute; inset: -18%; display: grid; place-items: center; opacity: .5; animation: cdBreath 3s ease-in-out infinite alternate; }
-@keyframes cdBreath { from { transform: scale(.96); opacity: .35; } to { transform: scale(1.04); opacity: .6; } }
+.cd-art { position: relative; width: calc(var(--u) * 92); aspect-ratio: 1; max-width: 100%; display: grid; place-items: center; }
+.cd-line { position: absolute; inset: calc(var(--u) * -11.1); display: grid; place-items: center; opacity: .5; animation: cdBreath 3s ease-in-out infinite alternate; }
+@keyframes cdBreath { from { transform: scale(.96); opacity: .24; } to { transform: scale(1.04); opacity: .42; } }
 .cd-line canvas { width: 100%; height: 100%; }
 @keyframes cdSpin { to { transform: rotate(360deg); } }
-.cd-emoji { position: relative; font-size: calc(var(--u) * 34); line-height: 1;
+.cd-emoji { position: relative; font-size: calc(var(--u) * 51); line-height: 1;
   filter: drop-shadow(0 0 22px var(--c)) drop-shadow(0 0 6px var(--c));
   animation: cdPop .5s cubic-bezier(.2, 1.6, .4, 1), cdFloat 3s ease-in-out .5s infinite alternate; }
 @keyframes cdPop { from { transform: scale(.3) rotate(-20deg); opacity: 0; } }
@@ -341,8 +366,21 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
 .diag.warn { color: var(--bomb); opacity: .9; }
 @media (prefers-reduced-motion: reduce) {
   .stage.slow .warp { animation: none; }
-  .rank-emoji,
+  .rank-emoji, .rank::after, .rank-arrow,
   .newbest, .go-title, .overlay, .bump, .sweep, .banner.pop .b-main, .banner.pop .b-top, .banner.pop .b-sub, .banner.pop .b-band, .banner.pop .b-emoji { animation: none; }
+}
+@media (max-height: 700px) {
+  .overlay.titlescr { padding-block: 14px 12px; gap: 10px; }
+  .title-main { gap: 12px; }
+  .logo { font-size: clamp(40px, calc(var(--u) * 14), 60px); }
+  .rules { gap: 6px; font-size: 13px; }
+  .rules .e { font-size: 19px; }
+  .titlescr .btn { padding: 14px 42px; }
+  .start-group { gap: 10px; }
+  .mute { min-height: 34px; padding: 7px 16px; }
+  .rank { padding: 10px 14px; gap: 6px; }
+  .rank-emoji { font-size: calc(var(--u) * 12); }
+  .rank-cta { padding: 6px 12px; }
 }
 </style>
 <style>html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
@@ -405,7 +443,8 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
         </div>
       </div>
       <div class="rank-score"><span>HIGH SCORE</span><b id="rankScore">0</b></div>
-      <div class="rank-hint">TAP TO VIEW TITLES ・ <b id="rankCount">0 / 51</b> ›</div>
+      <div class="rank-cta"><span class="ic">📖</span><span>TITLE COLLECTION</span><b id="rankCount">0 / 51</b><span class="go">›</span></div>
+      <span class="rank-arrow" aria-hidden="true">›</span>
     </section>
   </div>
 
